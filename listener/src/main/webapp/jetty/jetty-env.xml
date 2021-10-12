@@ -1,1 +1,28 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
+ <!DOCTYPE Configure PUBLIC "-//Jetty//Configure//EN" "http://www.eclipse.org/jetty/configure_9_3.dtd">
+
+ <Configure class="org.eclipse.jetty.webapp.WebAppContext">
+ 
+   <!-- an XADataSource                                                -->
+   <New id="myColaTestCF" class="org.eclipse.jetty.plus.jndi.Resource">
+     <Arg>jms/CF/colaTest</Arg>
+     <Arg>
+       <New class="org.apache.activemq.ActiveMQConnectionFactory">
+         <Set name="userName">admin</Set>
+         <Set name="password">admin</Set>
+         <Set name="brokerURL">tcp://localhost:61616</Set>
+       </New>
+     </Arg>
+   </New>
+   
+   
+   <New id="myColaTestQ" class="org.eclipse.jetty.plus.jndi.Resource">
+     <Arg>jms/Q/colaTest</Arg>
+     <Arg>
+       <New class="org.apache.activemq.command.ActiveMQQueue">
+       	<Arg>colaTest</Arg>
+       </New>
+     </Arg>
+   </New>
+ 
+ </Configure>
