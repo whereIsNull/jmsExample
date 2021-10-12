@@ -9,8 +9,9 @@ Este proyecto se ha generado con el arquetipo maven maven-archetype-webapp desde
 -javax.jms:javax.jms-api:2.0.1 -> Las interfaces de la especificación JMS que serán implementadas por las clases de Spring
 -org.apache.activemq:activemq-core:5.7.0 -> Las clases de activemq que emplearemos para crear los recursos de servidor al levantar el Jetty
 
-PASO 1: Crear nuestra clase Listener (com.colas.listener.MessageListener). Implementa la interfaz javax.jms.Listener de la especificación JMS la cual tiene un método: onMessage. En nuestro ejemplo simplemente leerá el mensaje y lo pintará por pantalla:
+**PASO 1**: Crear nuestra clase Listener (com.colas.listener.MessageListener). Implementa la interfaz javax.jms.Listener de la especificación JMS la cual tiene un método: onMessage. En nuestro ejemplo simplemente leerá el mensaje y lo pintará por pantalla:
 
+```java
 public void onMessage(Message message) {
     if (message instanceof TextMessage) {
         try {
@@ -24,9 +25,11 @@ public void onMessage(Message message) {
         throw new IllegalArgumentException("Message must be of type TextMessage");
     }
 }
+```
 
-PASO 2: Editar la configuración de Spring para indicar que será un bean de nuestra clase MessageListener la encargada de leer el mensaje (https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/jms.html):
+**PASO 2**: Editar la configuración de Spring para indicar que será un bean de nuestra clase MessageListener la encargada de leer el mensaje (https://docs.spring.io/spring-framework/docs/3.2.x/spring-framework-reference/html/jms.html):
 
+```xml
 <bean id="messageListener" class="com.colas.listener.MessageListener" />  
     
 <!-- and this is the message listener container... -->
@@ -35,9 +38,11 @@ PASO 2: Editar la configuración de Spring para indicar que será un bean de nue
     <property name="destination" ref="colaTestQueue"/>
     <property name="messageListener" ref="messageListener" />
 </bean>
+```
 
-PASO 3: Indicar en el fichero de configuración de jetty (jetty-env.xml) los dos recursos que se van a crear para leer de la cola: La conectionFactory y el acceso a la cola concreta:
+**PASO 3**: Indicar en el fichero de configuración de jetty (jetty-env.xml) los dos recursos que se van a crear para leer de la cola: La conectionFactory y el acceso a la cola concreta:
 
+```xml
 <Configure class="org.eclipse.jetty.webapp.WebAppContext">
 
  <!-- an XADataSource                                                -->
@@ -62,12 +67,16 @@ PASO 3: Indicar en el fichero de configuración de jetty (jetty-env.xml) los dos
    </Arg>
  </New>
 </Configure>
+```
 
 Como se ve en el argumento pasado al constructor de la clase ActiveMQQueu, el nombre de la cola será colaTest. Las propiedades de ActiveMQConnectionFactory (userName, password y brokerURL) vienen con estos valores por defecto al arrancar ActiveMQ
 
-PASO 4: Acceder a los recursos del paso 3 mediante jndi desde la configuración de Spring:
+**PASO 4**: Acceder a los recursos del paso 3 mediante jndi desde la configuración de Spring:
+
+```xml
 <jee:jndi-lookup id="colaTestConnectionFactory" jndi-name="jms/CF/colaTest"/>
 <jee:jndi-lookup id="colaTestQueue" jndi-name="jms/Q/colaTest"/> 
+```
 
 Tras estos pasos ya tendríamos la aplicación lista para poder leer los mensajes escritos en la cola, ya sólo tendríamos que instalar ActiveMQ en nuestro equipo. Para ello (en Windows) descargamos el zip de aquí https://activemq.apache.org/components/classic/download/ y lo descomprimimos en cualquier carpeta. Una vez hecho esto nos movemos a la carpeta descargada desde la línea de comandos y desde la carpeta bin arrancamos el servidor de colas con la sentencia activemq start:
 ![image](https://user-images.githubusercontent.com/32089240/136984638-91fbcf0c-39c1-402f-b8a8-e7dd87aa8f54.png)
